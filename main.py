@@ -7,7 +7,7 @@ from discord.ext import commands
 import random
 
 
-token = "OTEyOTY3MDU2NTU3NzU2NDI2.YZ3o1A.Jp-cyPdENu4bG_y-sEl16iMYp2o"
+token = "Your Token"
 
 bot = commands.Bot(command_prefix=">", intents=discord.Intents.all())
 bot.remove_command('help')
