@@ -4,6 +4,7 @@ from discord import activity
 from discord.embeds import Embed
 from discord.enums import ActivityType
 from discord.ext.commands.core import has_permissions
+from discord.ext.commands.flags import F
 from discord.ui import Button, View
 from discord.ext import commands
 import random
@@ -225,30 +226,37 @@ async def unban(ctx, *, user=None):
 async def help(ctx):
     embed=discord.Embed(title="💡List Of Commands", description="**:tools: __Moderation__**")
     embed.add_field(name="``Ban``, ``Unban``, ``Purge``, ``Mute``, ``Unmute``", value="**:video_game: __Fun__**", inline=False)
-    embed.add_field(name="``Nickname``, ``howgay``, ``howsus``", value="**📦 __Misc__**")
+    embed.add_field(name="``nick``, ``howgay``, ``howsus``", value="**📦 __Misc__**")
     embed.add_field(name="``userinfo``, ``server``, ``ping``, ``help``, ``invite``", value="__*More Coming Soon!*__", inline=False)
     await ctx.send(embed=embed) 
 
 @bot.command(aliases=['nickname', 'changenick', 'changenickname'])
 async def nick(ctx, member:discord.Member=None):
-    CHOICES = ['nutbuster', 'buttnuter', 'Wooden Board', 'bozo', 'Arlo', 'Hubby', 'Wifey', 'Snake hoarder', 'Vietnam War Veteran 26', 'Poppins', 'Whatislife42', 'Hitchhiker ', 'Dumbass', 'Small plant', 'Medium plant', 'HUGE PLANT', 'Left shoe']
+    CHOICES = ['nutbuster', 'buttnuter', 'Wooden Board', 'bozo', 'Arlo', 'Hubby', 'Wifey', 'Snake hoarder', 'Vietnam War Veteran 26', 'Poppins', 'Whatislife42', 'Hitchhiker', 'Dumbass', 'Small plant', 'Medium plant', 'HUGE PLANT', 'Left shoe']
     nick=random.choice(CHOICES) 
     if member == None:
         member = ctx.author
     
     embed = discord.Embed(title=f"Changed Nickname for {member} to", description=f"``{nick}``")
+    
    
-    if ctx.author == member:
-        
-        await member.edit(nick=nick)
-        await ctx.send(embed=embed)
+    if member == bot.user:
+        await ctx.send('You cannot change my nickname!')
     else:
-        if ctx.author != commands.has_permissions(manage_nicknames=True):
-            await ctx.send("``You cant change other's nicknames!``")
+        if ctx.author == member:
+        
+            await member.edit(nick=nick)
+            await ctx.send(embed=embed)
         else:
-            if ctx.author != commands.has_permissions(manage_nicknames=False):
+            if  ctx.author.guild_permissions.manage_nicknames == False:
+                await ctx.send("``You cant change other's nicknames!``")
+            else:
                 await member.edit(nick=nick)
-                await ctx.send(embed=embed)   
+                await ctx.send(embed=embed)
+                    
+            
+                
+            
     
 
 @bot.command()
@@ -260,6 +268,23 @@ async def invite(ctx):
 async def prefixes(ctx):
     embed = discord.Embed(title="My Global Prefixes Are", description=f"``'>', '.', '-', ',', '!'``")
     await ctx.send(embed=embed)
+
+@bot.command()
+async def serverinfo(ctx):
+    guild = ctx.guild
+    embed = discord.Embed(title="Server Info", description="----------------------------------", timestamp=ctx.message.created_at)
+    embed.set_thumbnail(url=guild.icon)
+    embed.add_field(name="Number Of Channels", value=len(ctx.guild.channels), inline=False)
+    embed.add_field(name="Number Of Roles", value=len(ctx.guild.roles), inline=False)
+    embed.add_field(name="Number of Boosters:", value=guild.premium_subscription_count, inline=False)
+    embed.add_field(name="Member Count", value=guild.member_count, inline=False)
+    embed.add_field(name="Date Of Creation", value=guild.created_at.date(), inline=False)
+    embed.add_field(name="Owner Of Server", value=guild.owner, inline=False)
+    embed.add_field(name="Server ID", value=guild.id)
+    embed.set_footer(text=f"Requested By {ctx.author}")
+    await ctx.send(embed=embed)
+
+
 
 
 
