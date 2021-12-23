@@ -2,12 +2,15 @@ import discord
 from discord import activity
 from discord.embeds import Embed
 from discord.enums import ActivityType
+from discord.ext.commands.core import has_permissions
 from discord.ui import Button, View
 from discord.ext import commands
 import random
 
+from discord.utils import valid_icon_size
 
-token = "Your Token"
+
+token = "Token"
 
 bot = commands.Bot(command_prefix=">", intents=discord.Intents.all())
 bot.remove_command('help')
@@ -133,11 +136,12 @@ async def howsus(ctx, member:discord.Member = None):
     if member == None:
         member = ctx.author
 
+    IMG_CHOICES = ['https://raw.githubusercontent.com/callimarieYT/CalliWebsite/main/unnamed_1.png', 'https://cdn.discordapp.com/attachments/917008192892977232/923233802074095616/pony.gif', 'https://cdn.discordapp.com/attachments/917008192892977232/923233331750006804/F35A8FAE-91D4-4C56-A77F-C8770349D386.jpg']
     CHOICES = ['``yeah`` <a:noooo:910736617529036830>', '``no ``<:gary:913247181106995271>', '``maybe ``<:maybe:923015512630382623>']
 
     embed=discord.Embed(title=f"**Is The User {member} Sussy???**", description=f"\u200b")
     embed.add_field(name=f"**The Answer Is:** \u200b", value=f"**\u200b {random.choice(CHOICES)}** ")
-    embed.set_image(url="https://raw.githubusercontent.com/callimarieYT/CalliWebsite/main/unnamed_1.png")
+    embed.set_image(url=f"{random.choice(IMG_CHOICES)}")
     embed.set_footer(text=f"Requested By {member}", icon_url=ctx.author.avatar)
     await ctx.send(embed=embed)
  
@@ -168,10 +172,6 @@ async def ban(ctx, member:discord.Member, *, reason=None):
     embed = discord.Embed(title=f"succesfully banned {member.name} from this server", description=f"Reason: {reason}\nBy: {ctx.author.mention}")  
     await ctx.send(embed=embed)
    
-
-   
-
-
 
 @ban.error
 async def ban_error(ctx, error):
@@ -210,12 +210,24 @@ async def unban(ctx, *, user=None):
 
 @bot.command()
 async def help(ctx):
-    embed=discord.Embed(title="Commands can be found here", description="\n**http://hacked-my.email/discord.html** I own the website btw")
+    embed=discord.Embed(title="Commands can be found here", description="\n**http://hacked-my.email/help.html** I own the website btw")
     await ctx.send(embed=embed)
- 
 
-
-
+@bot.command()
+async def nick(ctx, member:discord.Member=None):
+    CHOICES = ['nutbuster', 'buttnuter', 'Wooden Board', 'bozo']
+    nick=random.choice(CHOICES)
+    if member == None:
+        member = ctx.author
+    
+    embed = discord.Embed(title=f"Changed Nickname for {member} to", description=f"``{nick}``")
+    if ctx.author == member:
+        
+        await member.edit(nick=nick)
+        await ctx.send(embed=embed)
+    elif ctx.author != commands.has_permissions(manage_nicknames=True):
+        await ctx.send("You cant change other's nicknames!")
+  
 
 
 
