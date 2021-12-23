@@ -10,7 +10,7 @@ import random
 from discord.utils import valid_icon_size
 
 
-token = "Token"
+token = "OTEyOTY3MDU2NTU3NzU2NDI2.YZ3o1A.jjrZuFapNgDgIo7nfN_xCBDeF_E"
 
 prefixes = ['>', '.', '-', ',', '!']
 
@@ -135,11 +135,12 @@ async def server(ctx):
 
 @bot.command()
 async def howgay(ctx, member:discord.Member = None):
+    IMG_CHOICES = ['https://raw.githubusercontent.com/callimarieYT/CalliWebsite/main/unnamed_1.png', 'https://cdn.discordapp.com/attachments/917008192892977232/923233802074095616/pony.gif', 'https://cdn.discordapp.com/attachments/917008192892977232/923233331750006804/F35A8FAE-91D4-4C56-A77F-C8770349D386.jpg', 'https://cdn.discordapp.com/attachments/904887116381700147/923585698743848960/1639974673621.jpg', 'https://cdn.discordapp.com/attachments/904887116381700147/923585702858489876/IMG_7525.png', 'https://cdn.discordapp.com/attachments/904887116381700147/923585713612685312/IMG_7515.jpg', 'https://cdn.discordapp.com/attachments/904887116381700147/923585721581858876/IMG_7512.png', 'https://cdn.discordapp.com/attachments/904887116381700147/923585864708272138/IMG_7508.gif', 'https://cdn.discordapp.com/attachments/904887116381700147/923585885075804190/FFTEwb5XoAEUYzm.jpg', 'https://media.discordapp.net/attachments/839929143512137758/918655740716134400/A2C66C28-91A6-4802-978A-FB4B2ECF2414.gif', 'https://cdn.discordapp.com/attachments/904887116381700147/923585946207793262/565758E6-3785-47F0-8DC7-CB4A6C9E11D1.gif', 'https://media.discordapp.net/attachments/907282095221665835/918919536886030406/caption.gif']
     if member == None:
         member = ctx.author
 
     embed=discord.Embed(title="how gay are you!!!", description=f"**{member.mention} is {random.randint(0,100)}% homosexual🏳️‍🌈🏳️‍🌈🏳️‍🌈🏳️‍🌈🏳️‍🌈**")
-    embed.set_image(url='https://media.discordapp.net/attachments/814362660622958644/913686144753991710/FCuz4ydWYAM9oaZ.jpg')
+    embed.set_image(url=random.choice(IMG_CHOICES))
     await ctx.send(embed=embed) 
 
 @bot.command(aliases=['howsussy', 'howsussybaka'])
@@ -147,7 +148,7 @@ async def howsus(ctx, member:discord.Member = None):
     if member == None:
         member = ctx.author
 
-    IMG_CHOICES = ['https://raw.githubusercontent.com/callimarieYT/CalliWebsite/main/unnamed_1.png', 'https://cdn.discordapp.com/attachments/917008192892977232/923233802074095616/pony.gif', 'https://cdn.discordapp.com/attachments/917008192892977232/923233331750006804/F35A8FAE-91D4-4C56-A77F-C8770349D386.jpg']
+    IMG_CHOICES = ['https://raw.githubusercontent.com/callimarieYT/CalliWebsite/main/unnamed_1.png', 'https://cdn.discordapp.com/attachments/917008192892977232/923233802074095616/pony.gif', 'https://cdn.discordapp.com/attachments/917008192892977232/923233331750006804/F35A8FAE-91D4-4C56-A77F-C8770349D386.jpg', 'https://cdn.discordapp.com/attachments/904887116381700147/923585698743848960/1639974673621.jpg', 'https://cdn.discordapp.com/attachments/904887116381700147/923585702858489876/IMG_7525.png', 'https://cdn.discordapp.com/attachments/904887116381700147/923585713612685312/IMG_7515.jpg', 'https://cdn.discordapp.com/attachments/904887116381700147/923585721581858876/IMG_7512.png', 'https://cdn.discordapp.com/attachments/904887116381700147/923585864708272138/IMG_7508.gif', 'https://cdn.discordapp.com/attachments/904887116381700147/923585885075804190/FFTEwb5XoAEUYzm.jpg', 'https://media.discordapp.net/attachments/839929143512137758/918655740716134400/A2C66C28-91A6-4802-978A-FB4B2ECF2414.gif', 'https://cdn.discordapp.com/attachments/904887116381700147/923585946207793262/565758E6-3785-47F0-8DC7-CB4A6C9E11D1.gif', 'https://media.discordapp.net/attachments/907282095221665835/918919536886030406/caption.gif']
     CHOICES = ['``yeah`` <a:noooo:910736617529036830>', '``no ``<:gary:913247181106995271>', '``maybe ``<:maybe:923015512630382623>']
 
     embed=discord.Embed(title=f"**Is The User {member} Sussy???**", description=f"\u200b")
@@ -221,12 +222,15 @@ async def unban(ctx, *, user=None):
 
 @bot.command()
 async def help(ctx):
-    embed=discord.Embed(title="Commands can be found here", description="\n**http://hacked-my.email/help.html** I own the website btw")
-    await ctx.send(embed=embed)
+    embed=discord.Embed(title="💡List Of Commands", description="**:tools: __Moderation__**")
+    embed.add_field(name="``Ban``, ``Unban``, ``Purge``, ``Mute``, ``Unmute``", value="**:video_game: __Fun__**", inline=False)
+    embed.add_field(name="``Nickname``, ``howgay``, ``howsus``", value="**📦 __Misc__**")
+    embed.add_field(name="``userinfo``, ``server``, ``ping``, ``help``, ``invite``", value="__*More Coming Soon!*__", inline=False)
+    await ctx.send(embed=embed) 
 
 @bot.command(aliases=['nickname', 'changenick', 'changenickname'])
 async def nick(ctx, member:discord.Member=None):
-    CHOICES = ['nutbuster', 'buttnuter', 'Wooden Board', 'bozo', 'Arlo', 'Hubby', 'Wifey', 'Snake hoarder', 'Vietnam War Veteran 26', 'lmao you got callimarie :troll:', 'Poppins', 'Whatislife42', 'Hitchhiker ', 'Dumbass', 'Small plant', 'Medium plant', 'HUGE PLANT', 'Left shoe']
+    CHOICES = ['nutbuster', 'buttnuter', 'Wooden Board', 'bozo', 'Arlo', 'Hubby', 'Wifey', 'Snake hoarder', 'Vietnam War Veteran 26', 'Poppins', 'Whatislife42', 'Hitchhiker ', 'Dumbass', 'Small plant', 'Medium plant', 'HUGE PLANT', 'Left shoe']
     nick=random.choice(CHOICES) 
     if member == None:
         member = ctx.author
@@ -246,6 +250,15 @@ async def nick(ctx, member:discord.Member=None):
                 await ctx.send(embed=embed)   
     
 
+@bot.command()
+async def invite(ctx):
+    embed = discord.Embed(title="You Can Add Oxygen With This Link", description='**https://discord.com/api/oauth2/authorize?client_id=912967056557756426&permissions=137841961990&scope=bot**')
+    await ctx.send(embed=embed)
+
+@bot.command()
+async def prefixes(ctx):
+    embed = discord.Embed(title="My Global Prefixes Are", description=f"``'>', '.', '-', ',', '!'``")
+    await ctx.send(embed=embed)
 
 
 
