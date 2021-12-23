@@ -1,3 +1,4 @@
+from enum import IntEnum
 import discord
 from discord import activity
 from discord.embeds import Embed
@@ -10,7 +11,7 @@ import random
 from discord.utils import valid_icon_size
 
 
-token = "OTEyOTY3MDU2NTU3NzU2NDI2.YZ3o1A.jjrZuFapNgDgIo7nfN_xCBDeF_E"
+token = "Token"
 
 prefixes = ['>', '.', '-', ',', '!']
 
