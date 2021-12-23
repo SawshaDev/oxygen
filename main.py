@@ -12,7 +12,9 @@ from discord.utils import valid_icon_size
 
 token = "Token"
 
-bot = commands.Bot(command_prefix=">", intents=discord.Intents.all())
+prefixes = ['>', '.', '-', ',', '!']
+
+bot = commands.Bot(command_prefix=prefixes, intents=discord.Intents.all())
 bot.remove_command('help')
 
 @bot.event
@@ -73,9 +75,13 @@ async def mute(ctx, member: discord.Member, *, reason=None):
         
     embed =  discord.Embed(title="❌ Muted", description=f"{ctx.author.mention} Muted {member.mention}", colour=discord.Colour.light_gray())
     embed.add_field(name="reason:", value=reason, inline=False)
-    await ctx.send(embed=embed)
-    await member.add_roles(mutedRole, reason=reason)
-    await member.send(f'You have been muted from {guild.name}! \n Reason: {reason}')
+    
+    if member == ctx.author:
+        await ctx.send('you cannot mute yourself!')
+    else:
+        await ctx.send(embed=embed)
+        await member.add_roles(mutedRole, reason=reason)
+        await member.send(f'You have been muted from {guild.name}! \n Reason: {reason}')
 
 
 
@@ -87,11 +93,16 @@ async def unmute(ctx, member: discord.Member):
    mutedRole = discord.utils.get(ctx.guild.roles, name="Muted")
    if not mutedRole:
         mutedRole = await guild.create_role(name="Muted")
-   
-   await member.remove_roles(mutedRole)
-   await member.send(f" you have unmuted from: {ctx.guild.name}")
+    
    embed = discord.Embed(title="✅ Unmuted!", description=f"Unmuted {member.mention}",colour=discord.Colour.light_gray())
-   await ctx.send(embed=embed)
+   
+   if member != mutedRole:
+       await ctx.send("This user isn't Muted!")
+   else:
+       await member.remove_roles(mutedRole)
+       await ctx.send(embed=embed)
+       await member.send(f"you have unmuted from: {ctx.guild.name}")
+   
 
 
 @bot.command()
@@ -111,6 +122,7 @@ async def userinfo(ctx,member: discord.Member = None):
    embed.add_field(name=f"{member} was created at:", value=f"``{member.created_at.date()}``".replace("-", "/"), inline=False)
    embed.add_field(name=f"{member}'s User ID:", value=f"``{member.id}``", inline=False)
    embed.add_field(name=f"{member} Join Server Date", value=f"``{member.joined_at.date()}``".replace("-", "/"), inline=False)
+   
    embed.set_footer(text=f"Requested by {ctx.author}", icon_url = ctx.author.avatar)
 
    await ctx.send(embed=embed)     
@@ -118,8 +130,7 @@ async def userinfo(ctx,member: discord.Member = None):
 
 @bot.command(aliases=['servers', 'Servers', 'botservers'])
 async def server(ctx):
-    embed=discord.Embed(title="Server Count", description="Amount Of Servers Bot Is In")
-    embed.add_field(name=f"I'm in: ", value=f"**{str(len(bot.guilds))} Servers**", inline=False)
+    embed=discord.Embed(title="Server Count", description=f"**I am in {str(len(bot.guilds))} servers <:chad:923554621597818901>**")
     await ctx.send(embed=embed)
 
 @bot.command()
@@ -213,21 +224,28 @@ async def help(ctx):
     embed=discord.Embed(title="Commands can be found here", description="\n**http://hacked-my.email/help.html** I own the website btw")
     await ctx.send(embed=embed)
 
-@bot.command()
+@bot.command(aliases=['nickname', 'changenick', 'changenickname'])
 async def nick(ctx, member:discord.Member=None):
-    CHOICES = ['nutbuster', 'buttnuter', 'Wooden Board', 'bozo']
-    nick=random.choice(CHOICES)
+    CHOICES = ['nutbuster', 'buttnuter', 'Wooden Board', 'bozo', 'Arlo', 'Hubby', 'Wifey', 'Snake hoarder', 'Vietnam War Veteran 26', 'lmao you got callimarie :troll:', 'Poppins', 'Whatislife42', 'Hitchhiker ', 'Dumbass', 'Small plant', 'Medium plant', 'HUGE PLANT', 'Left shoe']
+    nick=random.choice(CHOICES) 
     if member == None:
         member = ctx.author
     
     embed = discord.Embed(title=f"Changed Nickname for {member} to", description=f"``{nick}``")
+   
     if ctx.author == member:
         
         await member.edit(nick=nick)
         await ctx.send(embed=embed)
-    elif ctx.author != commands.has_permissions(manage_nicknames=True):
-        await ctx.send("You cant change other's nicknames!")
-  
+    else:
+        if ctx.author != commands.has_permissions(manage_nicknames=True):
+            await ctx.send("``You cant change other's nicknames!``")
+        else:
+            if ctx.author != commands.has_permissions(manage_nicknames=False):
+                await member.edit(nick=nick)
+                await ctx.send(embed=embed)   
+    
+
 
 
 
