@@ -10,6 +10,8 @@ from discord.guild import Guild
 from discord.ui import Button, View
 from discord.ext import commands
 import random
+import json
+
 
 from discord.utils import valid_icon_size
 
@@ -40,7 +42,7 @@ async def sotd(ctx, channel: discord.TextChannel):
     em = discord.Embed(title="Song Of The Day <a:pepedance:920462135774027816>", description="**[40 days - Andrew Garden](https://open.spotify.com/track/3qve4a8uPsuWrZrkmtO9Dq?si=1425da64dd3644d4)**")
     em.add_field(name="Feedback:", value="**Indeed, 40 days does feel like years**", inline=True)
     await channel.send(embed=em)
-
+    
 @sotd.error
 async def sotd_error(ctx, error):
     channel = bot.get_channel(922807631784050698)
@@ -118,24 +120,30 @@ async def unmute(ctx, member: discord.Member):
 @bot.command()
 async def ping(ctx):
     embed = discord.Embed(title="Pong :ping_pong:", description = f"My latency is: {round(bot.latency * 1000)}ms", color=0x5d63c0)
-    embed.set_footer(text= f'Requested By {ctx.author}')
+    embed.set_footer(text= f'Requested By {ctx.author}', icon_url=ctx.author.avatar)
     await ctx.send(embed = embed)
     
 
 @bot.command(aliases=['whois'])
 async def userinfo(ctx,member: discord.Member = None):
+   guild = ctx.guild
    if member == None:
         member = ctx.author  
 
-   embed = discord.Embed(title=f"Info About ``{member}``", description=f"-----------------------------------------------------------")
-   embed.set_thumbnail(url=member.avatar.url)
-   embed.add_field(name=f"{member} was created at:", value=f"``{member.created_at.date()}``".replace("-", "/"), inline=False)
-   embed.add_field(name=f"{member}'s User ID:", value=f"``{member.id}``", inline=False)
-   embed.add_field(name=f"{member} Join Server Date", value=f"``{member.joined_at.date()}``".replace("-", "/"), inline=False)
-   
-   embed.set_footer(text=f"Requested by {ctx.author}", icon_url = ctx.author.avatar)
+   roles = " ".join([role.mention for role in member.roles if role.name != "@everyone"])
 
-   await ctx.send(embed=embed)     
+   if member == guild.owner:
+        await ctx.send(f"**Sorry But Due To Insufficient permissions, i cannot check ``{member}`` user info!**")
+   else:
+       embed = discord.Embed(title=f"Info About ``{member}``", description=f"-----------------------------------------------------------")
+       embed.set_thumbnail(url=member.avatar)
+       embed.add_field(name=f"{member} was created at:", value=f"``{member.created_at.date()}``".replace("-", "/"), inline=False)
+       embed.add_field(name=f"{member}'s User ID:", value=f"``{member.id}``", inline=False)
+       embed.add_field(name=f"{member} Join Server Date:", value=f"``{member.joined_at.date()}``".replace("-", "/"), inline=False)
+       embed.add_field(name=f"{member}'s Roles:", value=f"{roles}",inline=False)
+       embed.set_footer(text=f"Requested by {ctx.author}", icon_url = ctx.author.avatar)
+
+       await ctx.send(embed=embed)     
 
 
 @bot.command(aliases=['servers', 'Servers', 'botservers'])
@@ -235,11 +243,8 @@ async def unban(ctx, *, user=None):
 async def help(ctx):
     embed=discord.Embed(title="💡List Of Commands", description="**:tools: __Moderation__**")
     embed.add_field(name="``Ban``, ``Unban``, ``Purge``, ``Mute``, ``Unmute``", value="**:video_game: __Fun__**", inline=False)
-    embed.add_field(name="``nick``, ``howgay``, ``howsus``", value="**📦 __Misc__**")
-    embed.add_field(name="``userinfo``, ``server``, ``ping``, ``help``, ``invite``, ``serverinfo``"
-    
-    
-    , value="__*More Coming Soon!*__", inline=False)
+    embed.add_field(name="``nick``, ``howgay``, ``howsus``, ``facts``", value="**📦 __Misc__**")
+    embed.add_field(name="``userinfo``, ``server``, ``ping``, ``help``, ``invite``, ``serverinfo``", value="__*More Coming Soon!*__", inline=False)
     await ctx.send(embed=embed) 
 
 @bot.command(aliases=['nickname', 'changenick', 'changenickname'])
@@ -266,11 +271,7 @@ async def nick(ctx, member:discord.Member=None):
             else:
                 await member.edit(nick=nick)
                 await ctx.send(embed=embed)
-                    
-            
-                
-            
-    
+
 
 @bot.command()
 async def invite(ctx):
@@ -298,11 +299,15 @@ async def serverinfo(ctx):
     await ctx.send(embed=embed)
 
 
-@bot.command()
+@bot.command(aliases=['fact', 'randomfact'])
 async def facts(ctx):
     facts = randfacts.get_fact()
 
     embed = discord.Embed(title="Random Fact Generator!", description=f"``{facts}``")
     embed.set_footer(text=f"Requested By {ctx.author}", icon_url=ctx.author.avatar)
     await ctx.send(embed=embed)
+
+
+
+
 bot.run(token)
