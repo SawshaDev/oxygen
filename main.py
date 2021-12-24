@@ -1,16 +1,19 @@
 from enum import IntEnum
 import discord
 from discord import activity
+from discord import guild
 from discord.embeds import Embed
 from discord.enums import ActivityType
 from discord.ext.commands.core import has_permissions
 from discord.ext.commands.flags import F
+from discord.guild import Guild
 from discord.ui import Button, View
 from discord.ext import commands
 import random
 
 from discord.utils import valid_icon_size
 
+import randfacts
 
 token = "Token"
 
@@ -24,6 +27,11 @@ async def on_ready():
     await bot.change_presence(status=discord.Status.idle , activity=discord.Activity(type=discord.ActivityType.watching, name=f"{str(len(bot.guilds))} Servers | we need more "))
     print("Logged in as \n{0.user}".format(bot))
     print("-------------------------------------------------")
+
+@bot.event
+async def on_member_join(member):
+    guild = member.guild
+    await member.send(f'Welcome to **{guild}**')
 
 
 @bot.command()
@@ -180,10 +188,11 @@ async def ban(ctx, member:discord.Member, *, reason=None):
     if reason == None:
         reason="No Reason Specified" 
 
-    
+    embed = discord.Embed(title=f"succesfully banned {member.name} from this server", description=f"Reason: {reason}\nBy: {ctx.author.mention}")    
+
     await member.ban(reason=reason)
-    await member.send(f'You Have Been Banned From {ctx.guild.name} for \n {reason}')
-    embed = discord.Embed(title=f"succesfully banned {member.name} from this server", description=f"Reason: {reason}\nBy: {ctx.author.mention}")  
+    await member.send(f'``You Have Been Banned From {ctx.guild.name} for`` \n ``{reason}``')
+      
     await ctx.send(embed=embed)
    
 
@@ -227,12 +236,16 @@ async def help(ctx):
     embed=discord.Embed(title="💡List Of Commands", description="**:tools: __Moderation__**")
     embed.add_field(name="``Ban``, ``Unban``, ``Purge``, ``Mute``, ``Unmute``", value="**:video_game: __Fun__**", inline=False)
     embed.add_field(name="``nick``, ``howgay``, ``howsus``", value="**📦 __Misc__**")
-    embed.add_field(name="``userinfo``, ``server``, ``ping``, ``help``, ``invite``", value="__*More Coming Soon!*__", inline=False)
+    embed.add_field(name="``userinfo``, ``server``, ``ping``, ``help``, ``invite``, ``serverinfo``"
+    
+    
+    , value="__*More Coming Soon!*__", inline=False)
     await ctx.send(embed=embed) 
 
 @bot.command(aliases=['nickname', 'changenick', 'changenickname'])
 async def nick(ctx, member:discord.Member=None):
-    CHOICES = ['nutbuster', 'buttnuter', 'Wooden Board', 'bozo', 'Arlo', 'Hubby', 'Wifey', 'Snake hoarder', 'Vietnam War Veteran 26', 'Poppins', 'Whatislife42', 'Hitchhiker', 'Dumbass', 'Small plant', 'Medium plant', 'HUGE PLANT', 'Left shoe']
+    CHOICES = ['nutbuster', 'buttnuter', 'Wooden Board', 'bozo', 'Arlo', 'Hubby', 'Wifey', 'Snake hoarder', 'Vietnam War Veteran 26', 'Poppins', 'Whatislife42', 'Hitchhiker', 'Dumbass', 'Small plant', 'Medium plant', 'HUGE PLANT', 'Left shoe', 'Pope', 'AerosmithFan3', 'Your mother',
+    'Egg', 'Ocean', 'Clamsauce', 'Awesome Opossum!', 'Awesome Opossum!', 'Banned from subway', 'Car', 'Bosnias Chad Warrior :flag_ba:' ]
     nick=random.choice(CHOICES) 
     if member == None:
         member = ctx.author
@@ -272,7 +285,7 @@ async def prefixes(ctx):
 @bot.command()
 async def serverinfo(ctx):
     guild = ctx.guild
-    embed = discord.Embed(title="Server Info", description="----------------------------------", timestamp=ctx.message.created_at)
+    embed = discord.Embed(title=f"Server Info For {guild}", description="----------------------------------", timestamp=ctx.message.created_at)
     embed.set_thumbnail(url=guild.icon)
     embed.add_field(name="Number Of Channels", value=len(ctx.guild.channels), inline=False)
     embed.add_field(name="Number Of Roles", value=len(ctx.guild.roles), inline=False)
@@ -285,7 +298,11 @@ async def serverinfo(ctx):
     await ctx.send(embed=embed)
 
 
+@bot.command()
+async def facts(ctx):
+    facts = randfacts.get_fact()
 
-
-
+    embed = discord.Embed(title="Random Fact Generator!", description=f"``{facts}``")
+    embed.set_footer(text=f"Requested By {ctx.author}", icon_url=ctx.author.avatar)
+    await ctx.send(embed=embed)
 bot.run(token)
