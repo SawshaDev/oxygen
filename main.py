@@ -1,32 +1,49 @@
 from enum import IntEnum
+from typing import Optional
 import discord
 from discord import activity
 from discord import guild
 from discord.embeds import Embed
-from discord.enums import ActivityType
+from discord.enums import ActivityType, DefaultAvatar
 from discord.ext.commands.core import has_permissions
 from discord.ext.commands.flags import F
 from discord.guild import Guild
+from discord.mentions import A
 from discord.ui import Button, View
 from discord.ext import commands
 import random
 import json
 
 
+
+import praw
+
 from discord.utils import valid_icon_size
+from praw.reddit import Submission
 
 import randfacts
 
-token = "Token"
+token = ""
+
+
 
 prefixes = ['>', '.', '-', ',', '!']
 
-bot = commands.Bot(command_prefix=prefixes, intents=discord.Intents.all())
+
+bot = commands.Bot(command_prefix=prefixes , intents=discord.Intents.all())
 bot.remove_command('help')
+
+
+
+reddit = praw.Reddit(client_id='', #go to reddit developers website to get one
+                     client_secret='', #go to reddit developers website to get one
+                     user_agent='Oxygen',
+                     check_for_async= False)
+
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(status=discord.Status.idle , activity=discord.Activity(type=discord.ActivityType.watching, name=f"{str(len(bot.guilds))} Servers | we need more "))
+    await bot.change_presence(status=discord.Status.idle , activity=discord.Activity(type=discord.ActivityType.watching, name=f"{str(len(bot.guilds))} Servers!"))
     print("Logged in as \n{0.user}".format(bot))
     print("-------------------------------------------------")
 
@@ -39,8 +56,8 @@ async def on_member_join(member):
 @bot.command()
 @commands.has_permissions(administrator=True)
 async def sotd(ctx, channel: discord.TextChannel):
-    em = discord.Embed(title="Song Of The Day <a:pepedance:920462135774027816>", description="**[40 days - Andrew Garden](https://open.spotify.com/track/3qve4a8uPsuWrZrkmtO9Dq?si=1425da64dd3644d4)**")
-    em.add_field(name="Feedback:", value="**Indeed, 40 days does feel like years**", inline=True)
+    em = discord.Embed(title="Song Of The Day <a:pepedance:920462135774027816>", description="**[Chamomile - Khalil?](https://open.spotify.com/track/6KS2GSlCnTxWiVj3kpnZt5?si=d13697fe60714f49)**")
+    em.add_field(name="Feedback:", value="**Isn't that an animal?**", inline=True)
     await channel.send(embed=em)
     
 @sotd.error
@@ -73,6 +90,8 @@ async def botupdate_error(ctx, error):
 
 
 #Moderation Section
+
+
 @bot.command(description="Mutes Member")
 @commands.has_permissions(manage_messages=True)
 async def mute(ctx, member: discord.Member, *, reason=None):
@@ -92,6 +111,7 @@ async def mute(ctx, member: discord.Member, *, reason=None):
         await ctx.send('you cannot mute yourself!')
     else:
         await ctx.send(embed=embed)
+        await member.edit(roles=[mutedRole])
         await member.add_roles(mutedRole, reason=reason)
         await member.send(f'You have been muted from {guild.name}! \n Reason: {reason}')
 
@@ -101,20 +121,20 @@ async def mute(ctx, member: discord.Member, *, reason=None):
 @bot.command(description="Unmutes a specified user.")
 @commands.has_permissions(manage_messages=True)
 async def unmute(ctx, member: discord.Member):
+   member_roles = member.roles
    guild = ctx.guild
    mutedRole = discord.utils.get(ctx.guild.roles, name="Muted")
    if not mutedRole:
         mutedRole = await guild.create_role(name="Muted")
-    
-   embed = discord.Embed(title="✅ Unmuted!", description=f"Unmuted {member.mention}",colour=discord.Colour.light_gray())
-   
-   if member != mutedRole:
-       await ctx.send("This user isn't Muted!")
    else:
+       
        await member.remove_roles(mutedRole)
+       giveroles = discord.utils.get(ctx.guild.roles, member_roles)
+       await  member.add_roles(giveroles)
+       embed = discord.Embed(title="✅ Unmuted!", description=f"Unmuted {member.mention}",colour=discord.Colour.light_gray())
        await ctx.send(embed=embed)
        await member.send(f"you have unmuted from: {ctx.guild.name}")
-   
+
 
 
 @bot.command()
@@ -132,18 +152,27 @@ async def userinfo(ctx,member: discord.Member = None):
 
    roles = " ".join([role.mention for role in member.roles if role.name != "@everyone"])
 
-   if member == guild.owner:
+   if bot.user == ctx.guild.me.top_role:
         await ctx.send(f"**Sorry But Due To Insufficient permissions, i cannot check ``{member}`` user info!**")
    else:
-       embed = discord.Embed(title=f"Info About ``{member}``", description=f"-----------------------------------------------------------")
-       embed.set_thumbnail(url=member.avatar)
-       embed.add_field(name=f"{member} was created at:", value=f"``{member.created_at.date()}``".replace("-", "/"), inline=False)
-       embed.add_field(name=f"{member}'s User ID:", value=f"``{member.id}``", inline=False)
-       embed.add_field(name=f"{member} Join Server Date:", value=f"``{member.joined_at.date()}``".replace("-", "/"), inline=False)
-       embed.add_field(name=f"{member}'s Roles:", value=f"{roles}",inline=False)
-       embed.set_footer(text=f"Requested by {ctx.author}", icon_url = ctx.author.avatar)
+       if not member.avatar:
+            embed = discord.Embed(title=f"Info About ``{member}``", description=f"-----------------------------------------------------------")
+            embed.add_field(name=f"{member} was created at:", value=f"``{member.created_at.date()}``".replace("-", "/"), inline=False)
+            embed.add_field(name=f"{member}'s User ID:", value=f"``{member.id}``", inline=False)
+            embed.add_field(name=f"{member} Join Server Date:", value=f"``{member.joined_at.date()}``".replace("-", "/"), inline=False)
+            embed.add_field(name=f"{member}'s Roles:", value=f"{roles}",inline=False)
+            embed.set_footer(text=f"Requested by {ctx.author}", icon_url = ctx.author.avatar)
+            await ctx.send(embed=embed)
+       else:
+            embed = discord.Embed(title=f"Info About ``{member}``", description=f"-----------------------------------------------------------")
+            embed.set_thumbnail(url=member.avatar)
+            embed.add_field(name=f"{member} was created at:", value=f"``{member.created_at.date()}``".replace("-", "/"), inline=False)
+            embed.add_field(name=f"{member}'s User ID:", value=f"``{member.id}``", inline=False)
+            embed.add_field(name=f"{member} Join Server Date:", value=f"``{member.joined_at.date()}``".replace("-", "/"), inline=False)
+            embed.add_field(name=f"{member}'s Roles:", value=f"{roles}",inline=False)
+            embed.set_footer(text=f"Requested by {ctx.author}", icon_url = ctx.author.avatar)
 
-       await ctx.send(embed=embed)     
+            await ctx.send(embed=embed)     
 
 
 @bot.command(aliases=['servers', 'Servers', 'botservers'])
@@ -192,16 +221,26 @@ async def purge_error(ctx, error):
 
 @bot.command()
 @commands.has_permissions(ban_members=True)
-async def ban(ctx, member:discord.Member, *, reason=None):
-    if reason == None:
-        reason="No Reason Specified" 
+async def ban(ctx, member:discord.Member=None, *, reason=None):    
+    if member == None:
+        await ctx.send("``Who Are You Banning?``")
+    else:
+        if member == bot.user:
+            await ctx.send("``You Cannot Ban Me!``")
+        else:
+            if member == ctx.author:
+                await ctx.send('``You Cannot Ban Yourself!``')
+            else:    
+                if reason == None:
+                    reason="No Reason Specified" 
 
-    embed = discord.Embed(title=f"succesfully banned {member.name} from this server", description=f"Reason: {reason}\nBy: {ctx.author.mention}")    
+                embed = discord.Embed(title=f"succesfully banned {member.name} from this server", description=f"Reason: {reason}\nBy: {ctx.author.mention}")    
 
-    await member.ban(reason=reason)
-    await member.send(f'``You Have Been Banned From {ctx.guild.name} for`` \n ``{reason}``')
-      
-    await ctx.send(embed=embed)
+                await member.ban(reason=reason)
+                await member.send(f'``You Have Been Banned From {ctx.guild.name} for`` \n``{reason}``')
+                await ctx.send(embed=embed)
+                
+    
    
 
 @ban.error
@@ -242,20 +281,25 @@ async def unban(ctx, *, user=None):
 @bot.command()
 async def help(ctx):
     embed=discord.Embed(title="💡List Of Commands", description="**:tools: __Moderation__**")
-    embed.add_field(name="``Ban``, ``Unban``, ``Purge``, ``Mute``, ``Unmute``", value="**:video_game: __Fun__**", inline=False)
-    embed.add_field(name="``nick``, ``howgay``, ``howsus``, ``facts``", value="**📦 __Misc__**")
-    embed.add_field(name="``userinfo``, ``server``, ``ping``, ``help``, ``invite``, ``serverinfo``", value="__*More Coming Soon!*__", inline=False)
+    embed.add_field(name="``Ban``, ``Unban``, ``Purge``, ``Mute``, ``Unmute``, ``kick``", value="**:video_game: __Fun__**", inline=False)
+    embed.add_field(name="``nick``, ``howgay``, ``howsus``, ``facts``, ``memes``, ``osugame``, ``8ball``, ``banf``, ``spacify``", value="**📦 __Misc__**")
+    embed.add_field(name="``userinfo``, ``server``, ``ping``, ``help``, ``invite``, ``serverinfo``, ``banner``", value="__*More Coming Soon!*__", inline=False)
+   
     await ctx.send(embed=embed) 
 
 @bot.command(aliases=['nickname', 'changenick', 'changenickname'])
 async def nick(ctx, member:discord.Member=None):
-    CHOICES = ['nutbuster', 'buttnuter', 'Wooden Board', 'bozo', 'Arlo', 'Hubby', 'Wifey', 'Snake hoarder', 'Vietnam War Veteran 26', 'Poppins', 'Whatislife42', 'Hitchhiker', 'Dumbass', 'Small plant', 'Medium plant', 'HUGE PLANT', 'Left shoe', 'Pope', 'AerosmithFan3', 'Your mother',
-    'Egg', 'Ocean', 'Clamsauce', 'Awesome Opossum!', 'Awesome Opossum!', 'Banned from subway', 'Car', 'Bosnias Chad Warrior :flag_ba:' ]
-    nick=random.choice(CHOICES) 
+   
+    nick_file = open("nick.json", "r") # opens the nick file in "read" mode
+    nicks = json.loads(nick_file.read()) # loads the json
+    nick_file.close() # closes the nick file
+    
+    nick_choice = random.choice(nicks['nicks'])
+
     if member == None:
         member = ctx.author
     
-    embed = discord.Embed(title=f"Changed Nickname for {member} to", description=f"``{nick}``")
+    embed = discord.Embed(title=f"Changed Nickname for {member} to", description=f"``{nick_choice}``")
     
    
     if member == bot.user:
@@ -263,19 +307,20 @@ async def nick(ctx, member:discord.Member=None):
     else:
         if ctx.author == member:
         
-            await member.edit(nick=nick)
+            await member.edit(nick=nick_choice)
             await ctx.send(embed=embed)
         else:
             if  ctx.author.guild_permissions.manage_nicknames == False:
                 await ctx.send("``You cant change other's nicknames!``")
             else:
-                await member.edit(nick=nick)
+                await member.edit(nick=nick_choice)
                 await ctx.send(embed=embed)
+
 
 
 @bot.command()
 async def invite(ctx):
-    embed = discord.Embed(title="You Can Add Oxygen With This Link", description='**https://discord.com/api/oauth2/authorize?client_id=912967056557756426&permissions=137841961990&scope=bot**')
+    embed = discord.Embed(title="You Can Add Oxygen With This Link", description=f'[**oauth link**](https://discord.com/api/oauth2/authorize?client_id=912967056557756426&permissions=137841961990&scope=bot)')
     await ctx.send(embed=embed)
 
 @bot.command()
@@ -308,6 +353,135 @@ async def facts(ctx):
     await ctx.send(embed=embed)
 
 
+@bot.command(aliases=['meme'])
+async def memes(ctx):
+    meme_submissions = reddit.subreddit('meme').hot()
+    post_to_pick = random.randint(1,50)
+    for i in range(0, post_to_pick):
+        Submission = next(x for x in meme_submissions if not x.stickied)
+
+    embed = discord.Embed(title="Random Memes:", description=f"**[{Submission.title}]({Submission.url})**")
+    embed.set_image(url=Submission.url)    
+    await ctx.send(embed=embed)
 
 
-bot.run(token)
+@bot.command()
+async def spacify(ctx, message=None):
+    
+    
+
+    if message == None:
+        await ctx.send("You Didn't Give Me A Message!")
+    else:
+       message = message.replace('',' ')
+       message = message.replace('`', '\`')
+       message = message.replace("*", '\*')
+       message = message.replace("\\","\\\\")
+
+       await ctx.send(message)
+    
+@bot.command()
+@commands.has_permissions(ban_members=True)
+async def testing(ctx):
+    await ctx.send("Just Testing Some Things! \n Don't mind me!")
+
+@bot.command()
+async def christmas(ctx):
+    await ctx.send(f"Merry Christmas {ctx.author.mention} \nSorry There Wasn't more to this.\ni was gonna make this command a christmas reddit one but there aren't any christmas subreddits lol")
+
+
+@bot.command()
+async def osugame(ctx):
+    osu_submission = reddit.subreddit('osugame').hot()
+    post_to_pick = random.randint(1,30)
+    for i in range(0, post_to_pick):
+        submission = next(x for x in osu_submission if not x.stickied)
+
+    embed = discord.Embed(title="top osu posts:", description=f"**[{submission.title}](https://reddit.com{submission.permalink})**")
+    embed.set_image(url=submission.url)    
+    await ctx.send(embed=embed)
+
+@bot.command(aliases=["8ball"])
+async def _8ball(ctx, question=None,question2=None, question3=None, question4=None):
+    if question == None:
+        await ctx.send("You Need To Give Me A Question!")
+    else:
+        if question4 != None:
+            _8ball_file = open("responses.json", "r")
+            responses = json.loads(_8ball_file.read())
+            _8ball_file.close()
+            _8ball_choice = random.choice(responses['responses'])
+        
+            message = f"🎱**Question:** {question} {question2} {question3} {question4} \n**Answer:** {_8ball_choice}"
+            await ctx.send(message)    
+        else:
+            if question2 and question3== None:
+                _8ball_file = open("responses.json", "r")
+                responses = json.loads(_8ball_file.read())
+                _8ball_file.close()
+                _8ball_choice = random.choice(responses['responses'])
+        
+                message = f"🎱**Question:** {question}\n**Answer:** {_8ball_choice}"
+                await ctx.send(message)
+            else:
+                _8ball_file = open("responses.json", "r")
+                responses = json.loads(_8ball_file.read())
+                _8ball_file.close()
+                _8ball_choice = random.choice(responses['responses'])
+        
+                message = f"🎱**Question:** {question} {question2} {question3} \n**Answer:** {_8ball_choice}"
+                await ctx.send(message)
+
+@bot.command()
+@commands.has_permissions(kick_members=True)
+async def kick(ctx, member:discord.Member=None, *, reason=None):
+    if member == None:
+        await ctx.send("Who are you kicking?")
+    else:
+        if member == ctx.author:
+            await ctx.send('``You Cannot kick Yourself!``')
+        if reason == None:
+            reason="No Reason Specified"
+
+        embed = discord.Embed(title=f"Successfully kicked {member}", description=f"Reason: {reason}")   
+        await member.kick(reason=reason)
+        await member.send(f'``You Have Been Kicked From {ctx.guild.name} for`` \n ``{reason}``')
+        await ctx.send(embed=embed)
+
+
+@bot.command()
+async def banf(ctx, member:discord.Member=None, *, reason=None):
+    
+    if member == bot.user:
+        await ctx.send("BaNf Me AnD i WiLl ChOp OfF yOuR bAlLs!!!")
+    else:
+        if member == None:
+            await ctx.send("WHo ArE yOu BaNfInG?")
+        else: 
+            if member == ctx.author:
+                await ctx.send('``YoU cAnNoT bAnF yOuRsElF!!!``')
+            else:
+                if reason == None:
+                    reason="LmAo GeT bAnFeD!!!"
+                embed = discord.Embed(title=f"BaNfEd {member}", description=f"ReAsOn: {reason}")   
+                await ctx.send(embed=embed)  
+
+
+@bot.command()
+async def banner(ctx, member:discord.Member=None):
+    if member == None:
+        member = ctx.author
+
+    user = await bot.fetch_user(member.id)
+    banner_url = user.banner.url
+
+    embed = discord.Embed(title=f"Here's ``{member}``'s Banner")
+    embed.set_image(url=f"{banner_url}")
+    embed.set_footer(text= f'Requested By {ctx.author}', icon_url=ctx.author.avatar)
+    
+    await ctx.send(embed=embed)
+
+
+
+
+bot.run(token)  
