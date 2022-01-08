@@ -10,7 +10,7 @@ cogs_folder="./cogs"
 
 
 
-token = "OTEyOTY3MDU2NTU3NzU2NDI2.YZ3o1A.vKLHHRfbCc9GnOueJb3pe45kz64"
+token = ""
 
 
 
