@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="116.144 162.466 263.664 175.428" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com">
+  <defs>
+    <radialGradient gradientUnits="userSpaceOnUse" cx="112.445" cy="219.007" r="66.046" id="gradient-0" gradientTransform="matrix(0.840093, -1.016048, 1.367174, 1.130411, -160.506533, 113.184956)">
+      <stop offset="0" style="stop-color: rgba(255, 0, 0, 1)"/>
+      <stop offset="1" style="stop-color: rgba(153, 0, 0, 1)"/>
+    </radialGradient>
+    <radialGradient gradientUnits="userSpaceOnUse" cx="104.099" cy="203.123" r="66.046" id="gradient-2" gradientTransform="matrix(0.355703, -0.791948, 0.912211, 0.409719, 81.538252, 229.663779)">
+      <stop offset="0" style="stop-color: rgba(255, 0, 0, 1)"/>
+      <stop offset="1" style="stop-color: rgba(153, 0, 0, 1)"/>
+    </radialGradient>
+    <style bx:fonts="Aguafina Script" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Aguafina+Script%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
+    <style bx:fonts="Actor" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Actor%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
+  </defs>
+  <g transform="matrix(1, 0, 0, 1, -2.024, 0.180488)">
+    <title>Oxygen</title>
+    <ellipse style="stroke: rgb(0, 0, 0); fill: url(#gradient-2);" cx="288.785" cy="248.177" rx="66.046" ry="59.84" bx:origin="0.487 0.463">
+      <title>Circle 1</title>
+    </ellipse>
+    <ellipse style="stroke: rgb(0, 0, 0); fill: url(#gradient-0);" cx="211.215" cy="251.822" rx="66.046" ry="59.84">
+      <title>Other circle</title>
+    </ellipse>
+  </g>
+  <text style="fill: rgb(51, 51, 51); font-family: Actor; font-size: 33px; white-space: pre;" x="226.107" y="251.445" dx="-13.297" dy="1.773">Oxygen</text>
+</svg>
